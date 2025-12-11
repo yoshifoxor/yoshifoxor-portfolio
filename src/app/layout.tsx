@@ -1,6 +1,7 @@
 import { BIZ_UDPGothic } from 'next/font/google';
 
 import { BackgroundParticles } from '@/components/backgroundParticles';
+import { Header } from '@/components/header';
 
 import type { Metadata } from 'next';
 
@@ -30,14 +31,7 @@ export default function RootLayout({
           dark:bg-gray-900 dark:text-gray-100
         `}
       >
-        <header
-          className={`
-            fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-center
-            border-b border-gray-200 bg-white/70 backdrop-blur-md
-          `}
-        >
-          <h1 className="text-xl font-bold">Yoshifoxor Portfolio</h1>
-        </header>
+        <Header />
         <BackgroundParticles />
         <main className="relative z-10 flex flex-1 pt-16 align-middle">
           {children}
