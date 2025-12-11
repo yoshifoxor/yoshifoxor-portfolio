@@ -1,18 +1,158 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from '@eslint/js';
+import pluginNext from '@next/eslint-plugin-next';
+import tseslintParser from '@typescript-eslint/parser';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import pluginTailwind from 'eslint-plugin-better-tailwindcss';
+import pluginImport from 'eslint-plugin-import';
+import pluginReact from 'eslint-plugin-react';
+import pluginHooks from 'eslint-plugin-react-hooks';
+import tseslint from 'typescript-eslint';
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
+export default [
+  {
+    files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
+  },
+  {
+    ignores: [
+      '.next/**',
+      'build/**',
+      'out/**',
+      'node_modules/**',
+      'next-env.d.ts',
+      'public/**',
+    ],
+  },
+  {
+    name: 'next/core-web-vitals',
+    plugins: {
+      '@next/next': pluginNext,
+    },
+    rules: {
+      ...pluginNext.configs.recommended.rules,
+      ...pluginNext.configs['core-web-vitals'].rules,
+    },
+  },
+  {
+    name: 'eslint/recommended',
+    rules: {
+      ...js.configs.recommended.rules,
 
-export default eslintConfig;
+      'no-useless-rename': 'error',
+      'no-underscore-dangle': ['error', { allow: ['_id', '__dirname'] }],
+    },
+  },
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    name: 'typescript',
+    languageOptions: {
+      parser: tseslintParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: {
+      ['@typescript-eslint']: tseslint.plugin,
+    },
+    rules: {
+      ...tseslint.configs.recommendedTypeChecked.rules,
+      '@typescript-eslint/no-unused-vars': ['error'],
+      '@typescript-eslint/no-unsafe-assignment': ['off'],
+      '@typescript-eslint/require-await': ['off'],
+    },
+  },
+  {
+    name: 'react/jsx-runtime',
+    plugins: {
+      react: pluginReact,
+    },
+    rules: {
+      ...pluginReact.configs['jsx-runtime'].rules,
+      'react/self-closing-comp': ['error', { component: true, html: false }],
+      'react/jsx-curly-brace-presence': 'error',
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+  },
+  {
+    name: 'react-hooks/recommended',
+    plugins: {
+      'react-hooks': pluginHooks,
+    },
+    rules: pluginHooks.configs.recommended.rules,
+  },
+  {
+    name: 'plugin-import',
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
+        },
+      },
+    },
+    plugins: pluginImport.flatConfigs.recommended.plugins,
+    rules: {
+      ...pluginImport.flatConfigs.recommended.rules,
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
+          pathGroups: [
+            {
+              pattern: '{react,react-dom/**,react-router-dom}',
+              group: 'builtin',
+              position: 'before',
+            },
+            { pattern: 'next/**', group: 'builtin', position: 'before' },
+            {
+              pattern: '@/**',
+              group: 'parent',
+              position: 'before',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          alphabetize: {
+            order: 'asc',
+          },
+          'newlines-between': 'always',
+        },
+      ],
+    },
+  },
+  {
+    name: 'tailwindcss',
+    settings: {
+      'better-tailwindcss': {
+        entrypoint: './src/app/global.css',
+      },
+    },
+    plugins: {
+      'better-tailwindcss': pluginTailwind,
+    },
+    rules: {
+      // enable all recommended rules to report a warning
+      ...pluginTailwind.configs['recommended-warn'].rules,
+      // enable all recommended rules to report an error
+      ...pluginTailwind.configs['recommended-error'].rules,
+
+      'better-tailwindcss/enforce-consistent-line-wrapping': [
+        'error',
+        { group: 'newLine', preferSingleLine: true, printWidth: 80 },
+      ],
+      'better-tailwindcss/no-unregistered-classes': 'error',
+    },
+  },
+  eslintConfigPrettier,
+];
