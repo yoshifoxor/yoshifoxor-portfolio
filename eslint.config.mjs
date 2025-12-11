@@ -20,6 +20,7 @@ export default [
       'node_modules/**',
       'next-env.d.ts',
       'public/**',
+      '**/components/ui/**',
     ],
   },
   {
