@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { allSkills } from '@/lib/myData';
 
 function DevIcon({
@@ -14,7 +15,7 @@ function DevIcon({
         className?: string;
         size: string;
       }>[];
-  skill: { name: string };
+  skill: { name: string; description?: string };
 }) {
   return (
     <div className="p-4 sm:w-1/2 lg:w-1/3">
@@ -32,6 +33,14 @@ function DevIcon({
             )}
             <span className="ml-4 text-center text-lg font-semibold">
               {skill.name}
+              {skill.description && (
+                <>
+                  <Separator className="my-2 w-full" />
+                  <p className="text-center text-sm text-gray-600">
+                    {skill.description}
+                  </p>
+                </>
+              )}
             </span>
           </CardContent>
         </Card>
